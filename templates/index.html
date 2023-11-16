@@ -1,88 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm App Map</title>
+    <title>Farm App</title>
+
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Leaflet Control Geocoder CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Leaflet Control Geocoder JavaScript -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+
+    <!-- Leaflet Draw JavaScript -->
+    <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
 
 </head>
 <body>
-    <h1>Farm App</h1>
+
+<h1>Farm App</h1>
+
+<!-- Your existing map container -->
+<div id="map" style="height: 500px;"></div> <!-- div for map -->
+<button type="button" onclick="locateUser()">Select My Current Location</button>
 
 
-    <div id="map" style="height: 500px;"></div> <!-- div for map -->
+<form id="cropForm">
+    <label for="cropSelection">What do you grow?</label>
+    <select id="cropSelection" name="crop">
+        <option value="corn">Corn</option>
+        <option value="wheat">Wheat</option>
+        <option value="potatoes">Potatoes</option>
+        <option value="apples">Apples</option>
+        <option value="other">Other</option>
+    </select>
 
+    <button type="button" onclick="submitCrop()">Submit</button>
+</form>
 
-    <form id="cropForm">
-        <label for="cropSelection">What do you grow?</label>
-        <select id="cropSelection" name="crop">
-            <option value="corn">Corn</option>
-            <option value="wheat">Wheat</option>
-            <option value="potatoes">Potatoes</option>
-            <option value="apples">Apples</option>
-            <option value="other">Other</option>
-        </select>
+<!-- Flash messages section -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flash-messages">
+        {% for message in messages %}
+        <li class="flash-message">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
 
-        <button type="button" onclick="submitCrop()">Submit</button>
-    </form>
+<script>
+    function submitCrop() {
+        var selectedCrop = document.getElementById("cropSelection").value;
 
-    <!-- Flash messages section -->
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flash-messages">
-          {% for message in messages %}
-            <li class="flash-message">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+        // Prepare data object
+        var data = { crop: selectedCrop };
 
-    <script>
-        function submitCrop() {
-            var selectedCrop = document.getElementById("cropSelection").value;
+        console.log('Data before sending:', data);
 
-            // Prepare data object
-            var data = { crop: selectedCrop };
+        // Make a POST request with JSON data
+        fetch('http://127.0.0.1:8000/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            // Reload the page to see flash messages
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
 
-            console.log('Data before sending:', data);
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([0, 0], 2);
 
-            // Make a POST request with JSON data
-            fetch('http://127.0.0.1:8000/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                // Reload the page to see flash messages
-                location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    // Add a tile layer ( satellite layer )
+    var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '© Esri'
+    });
+
+    satelliteLayer.addTo(map); // Add the satellite layer to the map
+
+    // Initialize geocoding control with auto-complete
+    var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        collapsed: true,
+        geocoder: L.Control.Geocoder.nominatim({ geocodingQueryParams: { language: 'en', limit: 5 } }),
+        autoComplete: true, // Enable auto-complete
+        autoCompleteDelay: 250, // Set the delay for auto-complete
+        autoCollapse: true // Collapse the control after selecting a result
+    }).on('markgeocode', function (e) {
+        var bbox = e.geocode.bbox;
+        var poly = L.polygon([
+            bbox.getSouthEast(),
+            bbox.getNorthEast(),
+            bbox.getNorthWest(),
+            bbox.getSouthWest(),
+        ]).addTo(map);
+        map.fitBounds(poly.getBounds());
+    }).addTo(map);
+
+    // Add the Leaflet Draw control
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polygon: true,
+            circle: true,
+            marker: false, // Disable marker drawing
+            polyline: false, // Disable polyline drawing
+            rectangle: false // Disable rectangle drawing
+        },
+        edit: {
+            featureGroup: drawnItems,
+            remove: true
         }
-    </script>
+    });
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>     <!--map script -->
-    
-    <script>
-        // Initialize the map
-        var map = L.map('map').setView([0, 0], 2);
-    
-        // Add a tile layer (OpenStreetMap as an example)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-    </script>
-    
+    map.addControl(drawControl);
 
+    // Event handler for when a drawing is created
+    map.on('draw:created', function (event) {
+        var layer = event.layer;
+        drawnItems.addLayer(layer);
+    });
+
+    // locate user button
+    function locateUser() {
+        map.locate({ setView: true, maxZoom: 16 });
+    }
+</script>
 </body>
 </html>
