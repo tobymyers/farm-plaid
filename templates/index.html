@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm App Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+</head>
+<body>
+    <h1>Farm App</h1>
+
+
+    <div id="map" style="height: 500px;"></div> <!-- div for map -->
+
+
+    <form id="cropForm">
+        <label for="cropSelection">What do you grow?</label>
+        <select id="cropSelection" name="crop">
+            <option value="corn">Corn</option>
+            <option value="wheat">Wheat</option>
+            <option value="potatoes">Potatoes</option>
+            <option value="apples">Apples</option>
+            <option value="other">Other</option>
+        </select>
+
+        <button type="button" onclick="submitCrop()">Submit</button>
+    </form>
+
+    <!-- Flash messages section -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flash-messages">
+          {% for message in messages %}
+            <li class="flash-message">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <script>
+        function submitCrop() {
+            var selectedCrop = document.getElementById("cropSelection").value;
+
+            // Prepare data object
+            var data = { crop: selectedCrop };
+
+            console.log('Data before sending:', data);
+
+            // Make a POST request with JSON data
+            fetch('http://127.0.0.1:8000/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                // Reload the page to see flash messages
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>     <!--map script -->
+    
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([0, 0], 2);
+    
+        // Add a tile layer (OpenStreetMap as an example)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+    </script>
+    
+
+</body>
+</html>
