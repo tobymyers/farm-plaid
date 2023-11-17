@@ -19,11 +19,19 @@
     <!-- Leaflet JavaScript -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+    <!-- Leaflet GeometryUtil JavaScript -->
+    <script src="https://unpkg.com/leaflet-geometryutil"></script>
+
     <!-- Leaflet Control Geocoder JavaScript -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <!-- Leaflet Draw JavaScript -->
     <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
+
+
+
+
 
     <style>
         /* Add the styles from your provided CSS file here */
@@ -123,8 +131,7 @@
             <button type="button" onclick="locateUser()">Select My Current Location</button>
             <label for="polygonName">Field Name:</label>
             <input type="text" id="polygonName" name="polygonName" required>
-
-            <label for="area">Area (square meters):</label>
+            <label for="area">Area (hectares):</label>
             <input type="text" id="area" name="area" readonly>
 
             <!-- New field for displaying coordinates -->
@@ -258,20 +265,29 @@
         // Update the area field with the area of the drawn shape
         var areaField = document.getElementById("area");
 
-        // Reverse the order of coordinates and convert them to an array
-        var coordinates = layer.getLatLngs()[0].map(function (latLng) {
-            return [latLng.lng, latLng.lat];
-        });
+        // Check if areaField is not null and not undefined
+        if (areaField) {
+            // Get the LatLngs from the layer
+            var latLngs = layer.getLatLngs()[0]; // Assuming it's a polygon
 
-        var area = L.GeometryUtil.geodesicArea(coordinates);
-        areaField.value = area.toFixed(2) + " square meters";
+            // Calculate the area using Leaflet's getArea method
+            var areaSquareMeters = L.GeometryUtil.geodesicArea(latLngs);
+
+            // Convert square meters to hectares
+            var areaHectares = (areaSquareMeters / 10000).toFixed(2);
+
+            // Set the value of the areaField
+            areaField.value = areaHectares + " hectares";
+        }
 
         // Update the coordinates field with the coordinates of the drawn shape
         var coordinatesField = document.getElementById("coordinates");
-        coordinatesField.value = JSON.stringify(coordinates);
+
+        // Check if coordinatesField is not null and not undefined
+        if (coordinatesField) {
+            coordinatesField.value = JSON.stringify(latLngs);
+        }
     });
-
-
 
     // Function to submit the polygon data
     function submitPolygon() {
@@ -280,7 +296,10 @@
         var additionalData = document.getElementById("additionalData").value;
 
         // You can access the coordinates of the drawn polygon from 'drawnItems' feature group
-        var polygonCoordinates = drawnItems.toGeoJSON().features[0].geometry.coordinates;
+        var polygonCoordinates = drawnItems.toGeoJSON().features[0].geometry.coordinates[0].map(function (latLng) {
+            return [latLng.lng, latLng.lat];
+        });
+
 
         // Prepare data object
         var data = {
@@ -288,6 +307,7 @@
             additionalData: additionalData,
             coordinates: polygonCoordinates
         };
+
         console.log('Data before sending:', data);
 
         // Make a POST request with JSON data (you'll need to handle this in your Flask app)
