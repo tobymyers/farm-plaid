@@ -3,7 +3,10 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import json
 
+
 app = Flask(__name__)
+
+app.static_folder = 'static'
 app.config['SECRET_KEY'] = 'your_secret_key'
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
