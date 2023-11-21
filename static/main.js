@@ -2,69 +2,110 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize the map
-    var map = L.map('map').setView([0, 0], 10);
+    var map = L.map('map').setView([36.6777, -121.6549], 10)
+
+    // Ensure drawnItems is defined globally
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
 
     function saveField() {
         console.log('Attempting to saveField');
     
-        // Get form data
         var fieldNameElement = document.getElementById("polygonName");
-        var areaField = document.getElementById("area");
-        var currentCrop = document.getElementById("cropSelection").value;
-        var plantDate = document.getElementById("plantDate").value;
-        var harvestDate = document.getElementById("harvestDate").value;
+        var emailElement = document.getElementById("email");
     
-        if (fieldNameElement && areaField) {
+        if (fieldNameElement && emailElement) {
             var fieldValue = fieldNameElement.value;
-            var areaValue = areaField.value;
-            console.log('Field Name:', fieldValue);
-            console.log('Area:', areaValue);
-            console.log('Current Crop:', currentCrop);
-            console.log('Plant Date:', plantDate);
-            console.log('Harvest Date:', harvestDate);
+            var emailValue = emailElement.value;
     
-            // Get polygon coordinates
-            var drawnItems = map._layers[Object.keys(map._layers)[1]]; // Assuming the drawnItems is the second layer
-            var coordinates = drawnItems.toGeoJSON().features[0].geometry.coordinates[0];
-            console.log('Polygon Coordinates:', coordinates);
+            console.log('fieldValue:', fieldValue);
+            console.log('emailValue:', emailValue);
     
-            // Prepare data object
+            var area = document.getElementById("area").value;
+            var currentCrop = document.getElementById("cropSelection").value;
+
+            var plantDateElement = document.getElementById("plantDate");
+            var harvestDateElement = document.getElementById("harvestDate");
+
+
+            ///
+            var plantDate = plantDateElement.value ? new Date(plantDateElement.value).toISOString().split('T')[0] : null;
+            var harvestDate = harvestDateElement.value ? new Date(harvestDateElement.value).toISOString().split('T')[0] : null;
+
+            ///
+
+            // Convert date strings to ISO 8601 format
+    
+
+            console.log('plantDate:', plantDate);
+            console.log('harvestDate:', harvestDate);
+    
+            
+
+            // Get all layers from the drawnItems feature group
+            var allDrawnLayers = drawnItems.getLayers();
+
+            // Extracting coordinates from allDrawnLayers
+            var latLngs = allDrawnLayers.map(layer => {
+                if (layer instanceof L.Polygon || layer instanceof L.Polyline) {
+                    return layer.getLatLngs(); // For polygons and polylines
+                } else if (layer instanceof L.Marker) {
+                    return layer.getLatLng(); // For markers
+                }
+                // Add additional checks for other layer types if needed
+            });
+            // Flatten the coordinates array
+            //var flatLatLngs = latLngs.flat(Infinity);
+            var flatLatLngs = latLngs.flat(Infinity).map(latlng => ({ lat: latlng.lat, lng: latlng.lng }));
+
+
+
+            console.log('latLngs from drawnItems:', flatLatLngs);
+
+            // Prepare data object with coordinates
             var data = {
                 fieldName: fieldValue,
-                area: areaValue,
+                email: emailValue,
+                area: area,
                 currentCrop: currentCrop,
                 plantDate: plantDate,
                 harvestDate: harvestDate,
-                coordinates: coordinates
+                coordinates: flatLatLngs.map(point => [point.lat, point.lng])
+
+
+
             };
     
             console.log('Data before sending:', data);
+
+            console.log('Coordinates before sending:', JSON.stringify(flatLatLngs));
     
-            // Make a POST request with JSON data
-            fetch('http://127.0.0.1:8000/save-field', {
+            // Send data to the backend
+            fetch('/save_field', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    // Reload the page to see flash messages
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            .then(response => response.json())
+            .then(result => {
+                console.log('Success:', result);
+                // Handle success if needed
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // Handle error if needed
+            });
+    
         } else {
-            console.error('Element with ID "polygonName" or "area" not found');
+            console.error('Element with ID "polygonName" or "email" not found');
         }
     }
     
+
+    
+    // Make the saveField function globally accessible
     window.saveField = saveField;
 
     // Add a tile layer ( satellite layer )
@@ -98,8 +139,16 @@ document.addEventListener('DOMContentLoaded', function () {
     map.addLayer(drawnItems);
 
     var drawControl = new L.Control.Draw({
+
         draw: {
-            polygon: true,
+            polygon: {
+                shapeOptions: {
+                    fillColor: '#ff5a5e',
+                    color: '#ff5a5e'
+                },
+                tooltip: 'Draw your field boundaries!' // Tooltip text for the polygon button
+            },
+            // Add more draw options with tooltips as needed
             circle: false,
             marker: false, // Disable marker drawing
             polyline: false, // Disable polyline drawing
@@ -113,9 +162,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     map.addControl(drawControl);
 
+    ////
     map.on('draw:created', function (event) {
         var layer = event.layer;
         drawnItems.addLayer(layer);
+        console.log('Polygon created:', layer);
 
         // Update the area field with the area of the drawn shape
         var areaField = document.getElementById("area");
@@ -124,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (areaField) {
             // Get the LatLngs from the layer
             var latLngs = layer.getLatLngs()[0]; // Assuming it's a polygon
+            console.log('latLngs in map.on:', latLngs);
 
             // Calculate the area using Leaflet's getArea method
             var areaSquareMeters = L.GeometryUtil.geodesicArea(latLngs);
@@ -132,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var areaHectares = (areaSquareMeters / 10000).toFixed(2);
 
             // Set the value of the areaField
-            areaField.value = areaHectares + " hectares";
+            areaField.value = areaHectares;
         }
 
         // Update the coordinates field with the coordinates of the drawn shape
@@ -143,11 +195,28 @@ document.addEventListener('DOMContentLoaded', function () {
             coordinatesField.value = JSON.stringify(latLngs);
         }
     });
-
+   
 
     // locate user button
     window.locateUser = function locateUser() {
-        map.locate({ setView: true, maxZoom: 16 });
+        map.locate({ setView: true, maxZoom: 20 });
+    
     }
 
+    //scroll to map functionality 
+    function scrollToMap() {
+        var mapContainer = document.getElementById("map");
+
+        if (mapContainer) {
+            mapContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Attach the scrollToMap function to the CTA button
+    var ctaButton = document.getElementById("ctaButton");
+    if (ctaButton) {
+        ctaButton.addEventListener('click', scrollToMap);
+    }
 });
+
+

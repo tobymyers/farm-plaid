@@ -1,49 +1,91 @@
-from flask import Flask, render_template, request, jsonify, flash
-from flask_cors import CORS
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-import json
+from flask_cors import CORS  # Import CORS
+from datetime import datetime
 
+# Import your models from another file
+from models import User, Field, Coordinate, db
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
-app.static_folder = 'static'
-app.config['SECRET_KEY'] = 'your_secret_key'
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+# Configuration for the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-class Crop(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-
+# Define a route for the root URL
 @app.route('/')
-def index():
-    crops = Crop.query.all()
-    return render_template('index.html', crops=crops)
+def load_page():
+    return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
-def submit():
+
+# Routes for saving field data
+@app.route('/save_field', methods=['POST'])
+def save_field():
     try:
-        # Print the raw request data for inspection
-        print("Raw request data:", request.data)
+        data = request.get_json()
 
-        # Manually parse JSON from request data
-        data = json.loads(request.data.decode('utf-8'))
-        print("Received data:", data)
+        # Extract data from the request
+        field_name = data.get('fieldName')
+        email = data.get('email')
+        area = float(''.join(filter(str.isdigit, data.get('area'))))
+        current_crop = data.get('currentCrop')
 
-        new_crop = Crop(name=data['crop'])
-        db.session.add(new_crop)
+        
+        plant_date = datetime.strptime(data.get('plantDate'), '%Y-%m-%d').date()
+        harvest_date = datetime.strptime(data.get('harvestDate'), '%Y-%m-%d').date()
+
+        coordinates = data.get('coordinates', [])
+
+
+
+        # Ensure coordinates are in the required format
+        if isinstance(coordinates[0], dict):
+            print("isdict")
+            coordinates = [{'latitude': point['lat'], 'longitude': point['lng']} for point in coordinates]
+        elif isinstance(coordinates[0], (float, int)):
+            print("is not dict")
+            coordinates = [{'latitude': point[0], 'longitude': point[1]} for point in coordinates]
+
+        # Save user (if not exists)
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            user = User(email=email)
+            db.session.add(user)
+            db.session.commit()
+
+        # Save field
+        field = Field(
+            polygon_name=field_name,
+            area=area,
+            current_crop=current_crop,
+            plant_date=plant_date,
+            harvest_date=harvest_date,
+            user=user
+        )
+        db.session.add(field)
         db.session.commit()
 
-        flash('Your crop has been saved successfully!', 'success')
-        return jsonify({'status': 'success'})
+        # Save coordinates
+        for coordinate in coordinates:
+            lat, lon = coordinate  # Assuming coordinates is a list of tuples (latitude, longitude)
+            coord = Coordinate(latitude=lat, longitude=lon, field=field)
+            db.session.add(coord)
+        db.session.commit()
+
+        return jsonify({'message': 'Field data saved successfully'}), 200
+
     except Exception as e:
-        db.session.rollback()
-        flash('There was an error. Please try again.', 'error')
-        print(f"Error: {e}")
-        return jsonify({'status': 'error', 'message': str(e)})
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+# Initialize the SQLAlchemy object with the Flask app
+db.init_app(app)
+
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True, port=8000)

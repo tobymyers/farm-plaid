@@ -32,11 +32,32 @@
     <script src="{{ url_for('static', filename='main.js') }}"></script>
    
 </head>
+
+<header>
+    <img src="static/logo.png" alt="Logo" class="logo">
+    <nav>
+        <ul class="menu">
+            <li><a href="#about">About</a></li>
+            <li><a href="#privacy">Privacy</a></li>
+            <li><a href="#story">Story</a></li>
+        </ul>
+        <button class="login-button" onclick="openLoginModal()">Login</button>
+    </nav>
+</header>
 <body>
+<div class="header-content">
+    <h1>Turn Your Field Data into Earnings</h1>
+    <h3>Maintain your data in one place and get paid to do it</h3>
+    <p class="content">
+    We pay you to log and maintain your field data here. Other agtech platforms pay us to access it, saving you redundant data entry. You retain full control over who sees what.
+    </p>
 
-<h1>FieldShare</h1>
-<h3>Get paid to log your field data in one place, never have to log it in another app again</h3>
+    <!-- Updated CTA Button -->
+    <button class="cta-button" id="ctaButton" onclick="scrollToMap()">Draw a Field on the Map to Start</button>
 
+   
+</div>
+    
 <!-- Container for map and form -->
 <div id="container">
     <!-- Your existing map container -->
@@ -45,13 +66,11 @@
     <!-- Form for adding data about the polygon -->
     <div id="form-container">
         <form id="fieldForm">
-            <button type="button" onclick="locateUser()">Select My Current Location</button>
+            <button type="button" onclick="locateUser()">Go To My Current Location</button>
             <label for="polygonName">Field Name:</label>
-            <input type="text" id="polygonName" name="polygonName" required>
+            <input type="text" id="polygonName" name="polygonName" placeholder="Top High Clay"required>
             <label for="area">Area (hectares):</label>
             <input type="text" id="area" name="area" readonly>
-
-            <!-- New field for displaying coordinates -->
             <label for="cropSelection">Current Crop:</label>
             <select id="cropSelection" name="crop">
                 <option value="corn">Corn</option>
@@ -66,6 +85,13 @@
 
             <label for="harvestDate">Expected Harvest Date:</label>
             <input type="date" id="harvestDate" name="harvestDate">
+
+          
+            <!-- Updated Email Field -->
+            <label for="email">Email:</label>
+            <small class="form-text text-muted">We'll send you an email where you can set up an account to claim your farm and start getting paid.</small>
+            <input type="email" id="email" name="email" placeholder="you@yourfarm.com" required>
+            
 
             <button type="button" onclick="saveField()">Save Field</button>
         </form>
