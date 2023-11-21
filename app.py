@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS  # Import CORS
 from datetime import datetime
+import os
 
 # Import your models from another file
 from models import User, Field, Coordinate, db
@@ -9,9 +10,13 @@ from models import User, Field, Coordinate, db
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Configuration for the database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Get the database URL from the environment variable or use a default (SQLite for local development)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+
+
+# # Configuration for the database
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Define a route for the root URL
 @app.route('/')
@@ -88,4 +93,5 @@ db.init_app(app)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    port = int(os.environ.get('PORT', 8000))
+    app.run(debug=True, port=port)
