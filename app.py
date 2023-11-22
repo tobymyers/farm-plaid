@@ -3,20 +3,29 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS  # Import CORS
 from datetime import datetime
 import os
+from flask_migrate import Migrate
+from dotenv import load_dotenv
 
 # Import your models from another file
 from models import User, Field, Coordinate, db
 
+# Load environment variables from the .env file
+load_dotenv()
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Get the database URL from the environment variable or use a default (SQLite for local development)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+database_url = os.environ.get('CLOUD_DATABASE_URL', os.environ.get('LOCAL_DATABASE_URL'))
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://qwwyjzvsvlyzqj:d6edefaa80e6c75e2782acd4f8327ac5f7f2d714c6130b6ce6c4a19ed7e1c365@ec2-52-4-153-146.compute-1.amazonaws.com:5432/delcr43okma9ir'
 
 
-# # Configuration for the database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Initialize Flask-Migrate
+migrate = Migrate(app, db)
+
+
 
 # Define a route for the root URL
 @app.route('/')
