@@ -13,7 +13,7 @@ packaging==23.2
 typing_extensions==4.8.0
 Werkzeug==3.0.1
 
-
+flask-migrate
 
 Flask==2.2.5
 
