@@ -5,21 +5,37 @@ from datetime import datetime
 import os
 from flask_migrate import Migrate
 from dotenv import load_dotenv
+from config_dev import Config as DevConfig
+from config_prod import Config as ProdConfig
+
 
 # Import your models from another file
 from models import User, Field, Coordinate, db
 
 # Load environment variables from the .env file
-load_dotenv()
+#load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-database_url = os.environ.get('CLOUD_DATABASE_URL', os.environ.get('LOCAL_DATABASE_URL'))
+
+def load_config():
+    if os.environ.get('FLASK_ENV') == 'production':
+        app.config.from_object('config_prod.Config')
+
+        print("Configured for production environment.")
+    else:
+        app.config.from_object('config_dev.Config')
+        print("Configured for development environment.")
+
+# Call the function to load the configuration
+load_config()
+
+#database_url = os.environ.get('CLOUD_DATABASE_URL', os.environ.get('LOCAL_DATABASE_URL'))
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://qwwyjzvsvlyzqj:d6edefaa80e6c75e2782acd4f8327ac5f7f2d714c6130b6ce6c4a19ed7e1c365@ec2-52-4-153-146.compute-1.amazonaws.com:5432/delcr43okma9ir'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://qwwyjzvsvlyzqj:d6edefaa80e6c75e2782acd4f8327ac5f7f2d714c6130b6ce6c4a19ed7e1c365@ec2-52-4-153-146.compute-1.amazonaws.com:5432/delcr43okma9ir'
 
 
 # Initialize Flask-Migrate

@@ -1,4 +1,0 @@
-# .gitignore
-
-# Ignore environment variables file
-.flaskenv
