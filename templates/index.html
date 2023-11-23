@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm App</title>
+    <title>FieldView</title>
 
+    <!-- Your own styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -20,7 +23,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <!-- Leaflet GeometryUtil JavaScript -->
-    <script src="https://unpkg.com/leaflet-geometryutil"></script>
+    <script src="https://unpkg.com/leaflet-geometryutil/dist/leaflet.geometryutil.js"></script>
 
     <!-- Leaflet Control Geocoder JavaScript -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -28,10 +31,15 @@
     <!-- Leaflet Draw JavaScript -->
     <script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
 
- <!-- My javascript -->
+<!-- tippy -->
+    <script src="https://unpkg.com/popper.js@1"></script>
+    <script src="https://unpkg.com/tippy.js@5/dist/tippy-bundle.iife.js"></script>
+
+    <!-- Your own JavaScript -->
     <script src="{{ url_for('static', filename='main.js') }}"></script>
-   
 </head>
+
+
 
 <header>
     <img src="static/logo.png" alt="Logo" class="logo">
@@ -63,37 +71,90 @@
     <!-- Your existing map container -->
     <div id="map"></div>
 
+    
+
     <!-- Form for adding data about the polygon -->
     <div id="form-container">
         <form id="fieldForm">
             <button type="button" onclick="locateUser()">Go To My Current Location</button>
-            <label for="polygonName">Field Name:</label>
+            <label for="polygonName">Field Name<span class="required">*</span></label>
             <input type="text" id="polygonName" name="polygonName" placeholder="Top High Clay"required>
+           
             <label for="area">Area (hectares):</label>
             <input type="text" id="area" name="area" readonly>
-            <label for="cropSelection">Current Crop:</label>
+           
+            
+            <!-- <div class="dropdown">
+                <input type="text" id="cropInput" placeholder="Search for a crop...">
+                <div class="dropdown-content" id="cropDropdown">
+                    Add more crop options here
+                    <a href="#">Rice</a>
+                    <a href="#">Maize</a>
+                    <a href="#">Wheat</a>
+                    ... and so on
+                </div>
+            </div> -->
+            
+            <!-- <label for="cropInput">Current Crop</label>
+            <input type="text" id="cropInput" placeholder="Search for a crop..." oninput="filterCrops()">
+            <div id="cropDropdown" class="dropdown-content">
+    
+    
+                Add more crop options here
+            </div>  -->
+
+
+            <!-- <label for="cropSelection">Current Crop</label>
+            <input type="text" id="cropInput" placeholder="Search for a crop..." onkeyup="filterCrops()">
+            <div id="cropDropdown" class="dropdown-content">
+    Add more crop options here
+            </div> -->
+
+            
+            
+            <!-- <label for="cropSelection">Current Crop</label>
+            <select id="cropSelection" name="crop" onchange="filterCrops()"> -->
+                <!-- Add the 100 most common crops here
+                <option value="corn">Corn</option>
+                <option value="wheat">Wheat</option>
+                <option value="potatoes">Potatoes</option>
+                <option value="apples">Apples</option> -->
+            <!-- Add more crop options here -->
+            <!-- </select> -->
+
+            
+            <label for="cropSelection">Current Crop</label>
             <select id="cropSelection" name="crop">
                 <option value="corn">Corn</option>
                 <option value="wheat">Wheat</option>
                 <option value="potatoes">Potatoes</option>
                 <option value="apples">Apples</option>
                 <option value="other">Other</option>
-            </select>
+            </select> 
 
-            <label for="plantDate">Plant Date:</label>
-            <input type="date" id="plantDate" name="plantDate">
+            <label for="plantDate">Plant Date<span class="required">*</span></label>
+            <input type="date" id="plantDate" name="plantDate" required>
 
-            <label for="harvestDate">Expected Harvest Date:</label>
-            <input type="date" id="harvestDate" name="harvestDate">
+            <label for="harvestDate">Expected Harvest Date<span class="required">*</span></label>
+            <input type="date" id="harvestDate" name="harvestDate" required>
 
           
             <!-- Updated Email Field -->
-            <label for="email">Email:</label>
-            <small class="form-text text-muted">We'll send you an email where you can set up an account to claim your farm and start getting paid.</small>
+            <label for="email">Email<span class="required">*</span></label>
+            <small class="form-text text-muted">We'll send you an email where you can set up an account to claim your farm, add your other fields, and start getting paid.</small>
             <input type="email" id="email" name="email" placeholder="you@yourfarm.com" required>
             
 
-            <button type="button" onclick="saveField()">Save Field</button>
+            <!-- <button type="button" onclick="saveField()">Save Field</button> -->
+            <!-- <button class="save-field-btn" onclick="saveField()">Save Field</button> -->
+            <!-- <button class="save-field-btn" onclick="toggleSaveState(event); saveField(event)">
+                <span class="icon">&#10003;</span> Saved! Check Your Email
+              </button> -->
+            <button id="saveFieldBtn" class="save-field-btn">
+            Save Field
+            </button>
+              
+              
         </form>
     </div>
 </div>
@@ -111,4 +172,59 @@
 
 
 </body>
-</html>
+
+
+<!-- <script>
+    const input = document.getElementById("cropInput");
+    const dropdown = document.getElementById("cropDropdown");
+
+    // Show dropdown options when typing
+    input.addEventListener("input", function () {
+        const filter = input.value.toLowerCase();
+        const options = dropdown.getElementsByTagName("a");
+
+        for (const option of options) {
+            const cropName = option.textContent.toLowerCase();
+            option.style.display = cropName.includes(filter) ? "block" : "none";
+        }
+    });
+
+    // Handle selection (you can customize this part)
+    dropdown.addEventListener("click", function (event) {
+        if (event.target.tagName === "A") {
+            input.value = event.target.textContent;
+            dropdown.style.display = "none"; // Hide dropdown after selection
+        }
+    });
+</script> -->
+
+<!-- <script>
+    function filterCrops() {
+        const input = document.getElementById("cropInput");
+        const filter = input.value.toLowerCase();
+        const options = document.querySelectorAll("#cropDropdown option");
+    
+        options.forEach((option) => {
+            const cropName = option.textContent.toLowerCase();
+            if (cropName.includes(filter)) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        });
+    }
+    
+    // Add the 100 most common crops dynamically (you can replace these with actual crop names)
+    const commonCrops = [
+        "Rice", "Maize", "Wheat", "Soybeans", "Potatoes", "Tomatoes", "Lettuce", "Jalapeños" // ... and so on
+    ];
+    
+    const cropDropdown = document.getElementById("cropDropdown");
+    commonCrops.forEach((crop) => {
+        const option = document.createElement("option");
+        option.value = crop.toLowerCase();
+        option.textContent = crop;
+        cropDropdown.appendChild(option);
+    });
+    </script>
+</html> -->
