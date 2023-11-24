@@ -8,6 +8,7 @@
             margin: 0;
             padding: 40px;
             background-color: #ffffff; /* Airbnb background color */
+            line-height: 1.6;
         }
 
         /* Header Styles */
@@ -85,6 +86,10 @@
         .cta-button:hover {
             background-color: #ff7b82; /* Slightly lighter red on hover */
         }
+        .italic {
+            font-style: italic;
+            color: #777;
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -98,10 +103,29 @@
     <p>Method: <code>GET</code></p>
     <p>Returns fields and coordinates associated with the specified user ID.</p>
     <p>If the user ID is not found, it returns an error message.</p>
-
+    <h3> Non-Technical Description</h3>
+    <p>In case you aren't familiar with APIs, you can try it out right now in your browswer by going to https://field-view-a16f43470b9f.herokuapp.com/api/get_fields_coordinates/1 
+        which will return the fields associated with the first user to create a field. Feel free to change the user_id to 2, 3 etc and you will get different data </p>
+    <h3>Here's What Happens</h3>
+    <p>
+        <strong>1) Domain Resolution:</strong> The browser checks the Domain Name System (DNS) to resolve the domain name (if any) to an IP address. <span class="italic">This is like Chrome using its internal phone book to find FieldView's number.</span>
+    </p>
+    <p>
+        <strong>2) HTTP Request:</strong> The browser sends an HTTP request to the server identified by the resolved IP address, including the specific path and any query parameters specified in the URL. <span class="italic">This is like Chrome making a call to FieldView, asking for the data you requested, in this case information about fields associated with specific users.</span>
+    </p>
+    <p>
+        <strong>3) Server Processing:</strong> The server (in this case Heroku) receives the HTTP request, and the application layer (in this case the Flask python app), retrieves the data you are looking for from the PostgresSQL database. <span class="italic">The app has received the call from Chrome, and is looking around for the info requested.</span>
+    </p>
+    <p>
+        <strong>4) HTTP Response:</strong> The Flask app generates an HTTP response, in this case in the form of JSON, and send the response back to the user's browser. <span class="italic">FieldView found what Chrome was looking for and sent it over in a universally understandable format.</span>
+    </p>
+    <p>
+        <strong>5) Client Rendering:</strong> The browser receives the response and renders it accordingly. In this case, it gets displayed to you as text and numbers in a Chrome tab, but often another application will ingest the data directly and process it in some other way. <span class="italic">The browser receives the response and renders it accordingly. In this case, it gets displayed to you as text and numbers in a Chrome tab, but often another application will ingest the data directly and process it in some other way.</span>
+    </p>
+    
     <h3>Example:</h3>
     <p>Request: <code>/api/get_fields_coordinates/1</code></p>
-    <p>Response:</p>
+    <h3>Response:</h3>
     <pre>
 {
     "fields": [
