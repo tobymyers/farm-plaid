@@ -37,6 +37,18 @@
 
     <!-- Your own JavaScript -->
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+
+
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="FieldView - A Plaid for Field Data">
+    <meta property="og:description" content="A prototype built over 20 hours with ChatGPT">
+    <meta property="og:image" content="https://blogs.idc.com/wp-content/uploads/2022/10/Header-image_FA.jpg">
+    <meta property="og:url" content="https://field-view-a16f43470b9f.herokuapp.com/">
+    <meta property="og:type" content="website">
+
+    <!-- Favicon -->
+    <link rel="icon" href="static/favicon.ico">
 </head>
 
 
@@ -45,9 +57,8 @@
     <img src="static/logo.png" alt="Logo" class="logo">
     <nav>
         <ul class="menu">
-            <li><a href="#about">About</a></li>
-            <li><a href="#privacy">Privacy</a></li>
-            <li><a href="#story">Story</a></li>
+            <li><a href="/about">About</a></li> 
+            <li><a href="/api_doc.html">API</a></li>
         </ul>
         <button class="login-button" onclick="openLoginModal()">Login</button>
     </nav>
@@ -84,44 +95,7 @@
             <input type="text" id="area" name="area" readonly>
            
             
-            <!-- <div class="dropdown">
-                <input type="text" id="cropInput" placeholder="Search for a crop...">
-                <div class="dropdown-content" id="cropDropdown">
-                    Add more crop options here
-                    <a href="#">Rice</a>
-                    <a href="#">Maize</a>
-                    <a href="#">Wheat</a>
-                    ... and so on
-                </div>
-            </div> -->
-            
-            <!-- <label for="cropInput">Current Crop</label>
-            <input type="text" id="cropInput" placeholder="Search for a crop..." oninput="filterCrops()">
-            <div id="cropDropdown" class="dropdown-content">
-    
-    
-                Add more crop options here
-            </div>  -->
-
-
-            <!-- <label for="cropSelection">Current Crop</label>
-            <input type="text" id="cropInput" placeholder="Search for a crop..." onkeyup="filterCrops()">
-            <div id="cropDropdown" class="dropdown-content">
-    Add more crop options here
-            </div> -->
-
-            
-            
-            <!-- <label for="cropSelection">Current Crop</label>
-            <select id="cropSelection" name="crop" onchange="filterCrops()"> -->
-                <!-- Add the 100 most common crops here
-                <option value="corn">Corn</option>
-                <option value="wheat">Wheat</option>
-                <option value="potatoes">Potatoes</option>
-                <option value="apples">Apples</option> -->
-            <!-- Add more crop options here -->
-            <!-- </select> -->
-
+           
             
             <label for="cropSelection">Current Crop</label>
             <select id="cropSelection" name="crop">
@@ -141,7 +115,8 @@
           
             <!-- Updated Email Field -->
             <label for="email">Email<span class="required">*</span></label>
-            <small class="form-text text-muted">We'll send you an email where you can set up an account to claim your farm, add your other fields, and start getting paid.</small>
+            <small class="form-text text-muted">We'll send you an email where you can set up an account to claim your farm, add your other fields, and start getting paid. </small>
+            <small class="form-text text-muted" style="color: #ff5a5e;"> This is a beta, you won't actually get an email. Feel free to use a fake one. </small>
             <input type="email" id="email" name="email" placeholder="you@yourfarm.com" required>
             
 
@@ -159,6 +134,25 @@
     </div>
 </div>
 
+
+<!-- <script>
+    document.getElementById('saveFieldBtn').addEventListener('click', function() {
+        var email = document.getElementById('email').value;
+
+        // Make an AJAX request to your Flask backend
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/send_email', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                var response = JSON.parse(xhr.responseText);
+                alert(response.message);
+            }
+        };
+        xhr.send('email=' + encodeURIComponent(email));
+    });
+</script> -->
+
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -172,7 +166,7 @@
 
 
 </body>
-
+</html>
 
 <!-- <script>
     const input = document.getElementById("cropInput");

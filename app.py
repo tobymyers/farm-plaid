@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 from config_dev import Config as DevConfig
 from config_prod import Config as ProdConfig
-
+#import requests
 
 # Import your models from another file
 from models import User, Field, Coordinate, db
@@ -47,6 +47,91 @@ migrate = Migrate(app, db)
 @app.route('/')
 def load_page():
     return render_template('index.html')
+
+@app.route('/api_doc.html')
+def api_doc():
+    return render_template('api_doc.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+
+# API endpoint to get fields and coordinates by user ID
+@app.route('/api/get_fields_coordinates/<int:user_id>', methods=['GET'])
+def get_fields_coordinates(user_id):
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({'error': 'User ID not found'}), 404
+
+    fields = Field.query.filter_by(user=user).all()
+    fields_data = []
+
+    for field in fields:
+        coordinates = [{'latitude': coord.latitude, 'longitude': coord.longitude} for coord in field.coordinates]
+        fields_data.append({
+            'fieldName': field.polygon_name,
+            'area': field.area,
+            'currentCrop': field.current_crop,
+            'plantDate': field.plant_date.strftime('%Y-%m-%d'),
+            'harvestDate': field.harvest_date.strftime('%Y-%m-%d'),
+            'coordinates': coordinates,
+        })
+
+    return jsonify({'fields': fields_data}), 200
+
+
+
+# @app.route('/send_email', methods=['POST'])
+# def send_email():
+#     try:
+#         email = request.form.get('email')
+        
+#         # You can add validation for the email address here if needed
+
+#         # Mailgun API endpoint for sending emails
+#         mailgun_url = 'https://api.mailgun.net/v3/sandboxc3033524330845a18a396cce7622d4a2.mailgun.org/messages'
+
+#         # Mailgun API key
+#         api_key = '352688f735dd4e2ced184a1b20032fc1-5d2b1caa-6f337763'
+
+#         # Sender email address (should be from your Mailgun domain)
+#         from_email = 'field-viewl@sandboxc3033524330845a18a396cce7622d4a2.mailgun.org'
+
+#         # Email subject and body
+#         subject = 'Subject of the Email'
+#         body = 'Body of the Email'
+
+#         # Recipient email address
+#         to_email = email
+
+#         # Mailgun request data
+#         data = {
+#             'from': f'Mailgun Sandbox <{from_email}>',
+#             'to': to_email,
+#             'subject': subject,
+#             'text': body
+#         }
+
+#         # Mailgun request headers
+#         headers = {
+#             'Authorization': f'Basic {api_key}',
+#         }
+
+#         # Make the request to Mailgun API
+#         response = requests.post(mailgun_url, data=data, headers=headers)
+
+#         # Check if the email was sent successfully
+#         if response.status_code == 200:
+#             return jsonify({'status': 'success', 'message': 'Email sent successfully!'})
+#         else:
+#             return jsonify({'status': 'error', 'message': 'Failed to send email'})
+
+#     except Exception as e:
+#         return jsonify({'status': 'error', 'message': str(e)})
+
 
 
 # Routes for saving field data

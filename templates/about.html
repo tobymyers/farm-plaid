@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 80px;
+            background-color: #ffffff;
+            line-height: normal;
+        }
+
+        /* Main Content Styles */
+        main {
+            padding: 20px;
+        }
+
+        /* Text Styles */
+        h1, h2, h3, p, a {
+            color: #333;
+        }
+
+        h2{
+            padding-top: 40px;
+        }
+
+        h4{font-size: 1.3em}
+
+        p {
+            font-size: 1.1em;
+            color: #484848; /* Airbnb black color */
+            margin-bottom: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #ff5a5f;
+            font-weight: bold;
+        }
+
+        a:hover {
+            color: #ff7b82;
+        }
+
+        /* Header Content Styles */
+        .header-content {
+            text-align: center;
+            margin-top: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #484848;
+            line-height: 1.1;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #484848;
+        }
+    </style>
+    <title>About</title>
+</head>
+<body>
+    <main>
+        <div class="header-content">
+            <h1>About FieldView</h1>
+            <h4>Hi! 👋 I'm Toby Myers and I made this site over about 20 hours of conversation with ChatGPT 3.5. I'm not a developer. I'm a product manager who loves to learn fast and better understand the worlds of my design and engineering counterparts.</h4>
+        </div>
+
+        <div>
+            <h2>The Business Opportunity:</h2>
+            <p>Over the past months, I've had lots of conversations with farmers and agtech companies, 
+                and a theme has emerged; there's a lot of pain around getting and managing field-level data. 
+                On the farmer side, most apps demand similar information: field drawings, crop details, and harvest timelines. 
+                A farmer that works with 3 Agtech SaaS platforms has to manage and update the same information in 3 places. 
+                Farmers don't have time for that. </p>
+
+            <p>On the tech side, I've heard from leaders in the space - large incumbents and unicorns alike - 
+                how difficult it can be to get farmers to input data into their platforms and maintain it once it's there. 
+                 Part of the problem is likely that farmers already have to manage data in so many places - 
+                 there's little appetite for another app asking for the same information again. 
+                In many cases, the value that these companies can deliver to the their farmer customers 
+                (or other supply chain actors) is directly predicated on having quality field level data, 
+                much of which needs to be input manually. Lack of access to this data is a big, expensive problem. </p>
+        </div>
+
+        <div>
+            <h2>The Product Management Opportunity:</h2>
+            <p>I'm a big advocate for falling in love with the problem, 
+                rather than any individual solution to it. I'm not sure if this particular idea - 
+                a kind of "Plaid for Farm Data" - is a good one.
+                If I had to bet on the business model laid out on the landing page, I'd probably bet against it. </p>
+
+            <p>That being said, the value of this project is two-fold. First, think of the possibilities for rapid prototyping and user testing, 
+                without heavy reliance on engineering resources. 
+                Engineers and designers understandably hate to see their work go to waste. 
+                If I can use ChatGPT to whip up a solid prototype in a few days and test that with users, 
+                I'm more likely to set product requirements that drive real value. 
+                Low-code apps like bubble.io are a powerful tool here too, but they can't do it all. </p>
+
+            <p>Second, this project brought me further into the technical details than product people usually get the chance to go. 
+                I started with a sqllite db and a Flask App running locally, and then hosted the app on Heroku with a postgres sql database.
+                 When I wanted to set up my local database on postgres sql as well for smoother testing and deployment, 
+                 I had to face and overcome my own technical debt created hours before.  
+                 There were moments of amazement, like when I asked ChatGPT to produce css matching the Airbnb style and it did so flawlessly. 
+                 There were also many moments of frustration, like when I spent 3 hours working through SQLAlchemy / Python versioning 
+                 issues as I tried to run a database migration and deploy to Heroku. </p>
+                
+                <p>After 20 hours, I ended up with a functional development + production environment, 
+                    a user facing landing page that could be used to validate farmer desirability assumptions, 
+                    and a beta public API that could be used to test desirability on the agtech side. </p>
+
+            <p> The tools I used to build this include Leaflet.js for mapping, Dbeaver for db visualization, Heroku for hosting, iTerm2 because 
+                I got tired of the Mac Terminal, 
+                Python + Flask on the backend, Javascript + CSS + html on the front end without any particular framework, 
+                Postgressql for both the local and Heroku DB, and Visual Code Studio as an editor, 
+                SQL Alchemy as an ORM, and of course ChatGPT 3.5 for answering questions, editing code, interpreting console errors, etc </p>
+        </div>
+
+        <div>
+            <p>The process thus far has improved my technical fluency and prompt engineering skills, and reaffirmed my respect for the expertise of real developers and designers. Their work goes far beyond what a chatbot can achieve.</p>
+            <p>You can see my messy code on <a href="https://github.com/tobymyers/farm-plaid" target="https://github.com/tobymyers/farm-plaid">GitHub</a>.</p>
+        </div>
+
+        <div>
+            <h2>Contact:</h2>
+            <p>I'm currently seeking my next product role at the intersection of food systems and sustainability. If you find this work interesting, feel free to reach out via email at <a href="mailto:toby.isaac.myers@gmail.com">toby.isaac.myers@gmail.com</a> or on <a href="http://www.linkedin.com/in/tobyimyers" target="https://www.linkedin.com/in/tobyimyers/">LinkedIn</a>.</p>
+            <p>In case you're wondering, I wrote this page myself, but ChatGPT turned it into an HTML page and wrote the necessary CSS, Flask route, and HTML to integrate it into the app.</p>
+        </div>
+    </main>
+</body>
+</html>
