@@ -84,53 +84,6 @@ def get_fields_coordinates(user_id):
 
 
 
-# @app.route('/send_email', methods=['POST'])
-# def send_email():
-#     try:
-#         email = request.form.get('email')
-        
-#         # You can add validation for the email address here if needed
-
-#         # Mailgun API endpoint for sending emails
-#         mailgun_url = 'https://api.mailgun.net/v3/sandboxc3033524330845a18a396cce7622d4a2.mailgun.org/messages'
-
-#         # Mailgun API key
-#         api_key = '352688f735dd4e2ced184a1b20032fc1-5d2b1caa-6f337763'
-
-#         # Sender email address (should be from your Mailgun domain)
-#         from_email = 'field-viewl@sandboxc3033524330845a18a396cce7622d4a2.mailgun.org'
-
-#         # Email subject and body
-#         subject = 'Subject of the Email'
-#         body = 'Body of the Email'
-
-#         # Recipient email address
-#         to_email = email
-
-#         # Mailgun request data
-#         data = {
-#             'from': f'Mailgun Sandbox <{from_email}>',
-#             'to': to_email,
-#             'subject': subject,
-#             'text': body
-#         }
-
-#         # Mailgun request headers
-#         headers = {
-#             'Authorization': f'Basic {api_key}',
-#         }
-
-#         # Make the request to Mailgun API
-#         response = requests.post(mailgun_url, data=data, headers=headers)
-
-#         # Check if the email was sent successfully
-#         if response.status_code == 200:
-#             return jsonify({'status': 'success', 'message': 'Email sent successfully!'})
-#         else:
-#             return jsonify({'status': 'error', 'message': 'Failed to send email'})
-
-#     except Exception as e:
-#         return jsonify({'status': 'error', 'message': str(e)})
 
 
 

@@ -65,14 +65,16 @@
 </header>
 <body>
 <div class="header-content">
-    <h1>Turn Your Field Data into Earnings</h1>
+    <h1>Turn your field data into earnings</h1>
     <h3>Maintain your data in one place and get paid to do it</h3>
     <p class="content">
     We pay you to log and maintain your field data here. Other agtech platforms pay us to access it, saving you redundant data entry. You retain full control over who sees what.
     </p>
+    <p style="color: #ff5a5e; font-style: italic;">⭐️ I built this app over 20 hours of conversation with ChatGPT 3.5. Learn more on the<a href="about" style="color: #333333; font-weight: bold;"> About</a> page ⭐️</p>
+
 
     <!-- Updated CTA Button -->
-    <button class="cta-button" id="ctaButton" onclick="scrollToMap()">Draw a Field on the Map to Start</button>
+    <button class="cta-button" id="ctaButton" onclick="scrollToMap()">Draw your field to start</button>
 
    
 </div>
@@ -87,9 +89,9 @@
     <!-- Form for adding data about the polygon -->
     <div id="form-container">
         <form id="fieldForm">
-            <button type="button" onclick="locateUser()">Go To My Current Location</button>
+            <button type="button" onclick="locateUser()">Go to my current location</button>
             <small class="form-text text-muted" style = "color:#ff5a5e">Click the <span style="font-size: 18px; color: #464646">&#x2B1F;</span> button on the left to start drawing</small>
-            <label for="polygonName">Field Name<span class="required">*</span></label>
+            <label for="polygonName">Field name<span class="required">*</span></label>
             <input type="text" id="polygonName" name="polygonName" placeholder="Top High Clay"required>
            
             <label for="area">Area (hectares):</label>
@@ -98,7 +100,7 @@
             
            
             
-            <label for="cropSelection">Current Crop</label>
+            <label for="cropSelection">Current crop</label>
             <select id="cropSelection" name="crop">
                 <option value="corn">Corn</option>
                 <option value="wheat">Wheat</option>
@@ -107,10 +109,10 @@
                 <option value="other">Other</option>
             </select> 
 
-            <label for="plantDate">Plant Date<span class="required">*</span></label>
+            <label for="plantDate">Plant date<span class="required">*</span></label>
             <input type="date" id="plantDate" name="plantDate" required>
 
-            <label for="harvestDate">Expected Harvest Date<span class="required">*</span></label>
+            <label for="harvestDate">Expected harvest date<span class="required">*</span></label>
             <input type="date" id="harvestDate" name="harvestDate" required>
 
           
@@ -127,7 +129,7 @@
                 <span class="icon">&#10003;</span> Saved! Check Your Email
               </button> -->
             <button id="saveFieldBtn" class="save-field-btn">
-            Save Field
+            Save field
             </button>
               
               
@@ -136,23 +138,7 @@
 </div>
 
 
-<!-- <script>
-    document.getElementById('saveFieldBtn').addEventListener('click', function() {
-        var email = document.getElementById('email').value;
 
-        // Make an AJAX request to your Flask backend
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/send_email', true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                var response = JSON.parse(xhr.responseText);
-                alert(response.message);
-            }
-        };
-        xhr.send('email=' + encodeURIComponent(email));
-    });
-</script> -->
 
 <!-- Flash messages section -->
 {% with messages = get_flashed_messages() %}
@@ -169,57 +155,3 @@
 </body>
 </html>
 
-<!-- <script>
-    const input = document.getElementById("cropInput");
-    const dropdown = document.getElementById("cropDropdown");
-
-    // Show dropdown options when typing
-    input.addEventListener("input", function () {
-        const filter = input.value.toLowerCase();
-        const options = dropdown.getElementsByTagName("a");
-
-        for (const option of options) {
-            const cropName = option.textContent.toLowerCase();
-            option.style.display = cropName.includes(filter) ? "block" : "none";
-        }
-    });
-
-    // Handle selection (you can customize this part)
-    dropdown.addEventListener("click", function (event) {
-        if (event.target.tagName === "A") {
-            input.value = event.target.textContent;
-            dropdown.style.display = "none"; // Hide dropdown after selection
-        }
-    });
-</script> -->
-
-<!-- <script>
-    function filterCrops() {
-        const input = document.getElementById("cropInput");
-        const filter = input.value.toLowerCase();
-        const options = document.querySelectorAll("#cropDropdown option");
-    
-        options.forEach((option) => {
-            const cropName = option.textContent.toLowerCase();
-            if (cropName.includes(filter)) {
-                option.style.display = "block";
-            } else {
-                option.style.display = "none";
-            }
-        });
-    }
-    
-    // Add the 100 most common crops dynamically (you can replace these with actual crop names)
-    const commonCrops = [
-        "Rice", "Maize", "Wheat", "Soybeans", "Potatoes", "Tomatoes", "Lettuce", "Jalapeños" // ... and so on
-    ];
-    
-    const cropDropdown = document.getElementById("cropDropdown");
-    commonCrops.forEach((crop) => {
-        const option = document.createElement("option");
-        option.value = crop.toLowerCase();
-        option.textContent = crop;
-        cropDropdown.appendChild(option);
-    });
-    </script>
-</html> -->

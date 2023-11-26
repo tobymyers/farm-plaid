@@ -1,179 +1,59 @@
-// // Wait for the DOM to be fully loaded
-// document.addEventListener('DOMContentLoaded', function () {
-    
-//     // /////////////////////////////////
+document.addEventListener('DOMContentLoaded', function () {
+    var map = L.map('map').setView([36.6777, -121.6549], 10);
 
-//     // Initialize the map
-//     var map = L.map('map').setView([36.6777, -121.6549], 10)
+    // Ensure drawnItems is defined globally
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
 
-//     // Ensure drawnItems is defined globally
-//     var drawnItems = new L.FeatureGroup();
-//     map.addLayer(drawnItems);
-
-//    //////// 
-//    map.addControl(drawControl);
-
-//     var firstPolygon;
-
-//     map.on('draw:created', function (event) {
-//         var layer = event.layer;
-
-//         if (firstPolygon) {
-//             drawnItems.removeLayer(firstPolygon);
-//         }
-
-//         firstPolygon = layer;
-//         drawnItems.addLayer(layer);
-//     });
-
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        var map = L.map('map').setView([36.6777, -121.6549], 10);
-
-    //     
-    
-
-    
-        // Ensure drawnItems is defined globally
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
-    
-        var drawControl = new L.Control.Draw({
-            draw: {
-                polygon: {
-                    shapeOptions: {
-                        fillColor: '#ff5a5e',
-                        color: '#ff5a5e'
-                    },
-                    tooltip: 'Draw your field boundaries!' // Tooltip text for the polygon button
+    var drawControl = new L.Control.Draw({
+        draw: {
+            polygon: {
+                shapeOptions: {
+                    fillColor: '#ff5a5e',
+                    color: '#ff5a5e'
                 },
-                circle: false,
-                marker: false,
-                polyline: false,
-                rectangle: false
+                tooltip: 'Draw your field boundaries!'
             },
-            edit: {
-                featureGroup: drawnItems,
-                remove: true
-            }
-        });
+            circle: false,
+            marker: false,
+            polyline: false,
+            rectangle: false
+        },
+        edit: false // Set edit option to false to hide edit and delete buttons
+    });
 
-        // // Get the Leaflet Draw toolbar
-        // var drawToolbar = drawControl.getContainer();
+    map.addControl(drawControl);
 
-        // // Get the polygon draw button from the toolbar
-        // var drawPolygonButton = drawToolbar.querySelector('.leaflet-draw-draw-polygon');
+    var firstPolygon;
 
-        // // Add the tooltip using Tippy
-        // tippy(drawPolygonButton, {
-        // content: 'Click here to start drawing',
-        // });
-    
-        map.addControl(drawControl);
-    
-        var firstPolygon;
-    
-        map.on('draw:created', function (event) {
-            var layer = event.layer;
-    
-            if (firstPolygon) {
-                drawnItems.removeLayer(firstPolygon);
-            }
-    
-            firstPolygon = layer;
-            drawnItems.addLayer(layer);
-        }); 
-        map.on('draw:drawstart', function () {
-            if (firstPolygon) {
-                // Show Toast message only when there is an existing shape
-                tippy(document.body, {
-                    content: 'Let\'s keep it simple. Draw just one field to get started. You can draw more later',
-                    placement: 'top',
-                    duration: 3000, // 3 seconds
-                    theme: 'light',
-                    arrow: false,
-                    offset: [0, 10],
-                });
-    
-                drawnItems.removeLayer(firstPolygon);
-                firstPolygon = null;
-            }
-        });
-        // map.on('draw:drawstart', function () {
-        //     if (firstPolygon) {
-        //         drawnItems.removeLayer(firstPolygon);
-        //         firstPolygon = null;
-        //     }
-        // });
-   ///////////
+    map.on('draw:created', function (event) {
+        var layer = event.layer;
 
+        if (firstPolygon) {
+            drawnItems.removeLayer(firstPolygon);
+        }
 
+        firstPolygon = layer;
+        drawnItems.addLayer(layer);
+    }); 
 
-// function filterCrops() {
-//     const input = document.getElementById("cropInput");
-//     const filter = input.value.toLowerCase();
-//     const options = document.querySelectorAll("#cropDropdown option");
+    map.on('draw:drawstart', function () {
+        if (firstPolygon) {
+            tippy(document.body, {
+                content: 'Let\'s keep it simple. Draw just one field to get started. You can draw more later',
+                placement: 'top',
+                duration: 3000,
+                theme: 'light',
+                arrow: false,
+                offset: [0, 10],
+            });
 
-//     options.forEach((option) => {
-//         const cropName = option.textContent.toLowerCase();
-//         if (cropName.includes(filter)) {
-//             option.style.display = "block";
-//         } else {
-//             option.style.display = "none";
-//         }
-//     });
-// }
+            drawnItems.removeLayer(firstPolygon);
+            firstPolygon = null;
+        }
+    });
 
-// // Add the 100 most common crops dynamically (you can replace these with actual crop names)
-// const commonCrops = [
-//     "Rice", "Maize", "Wheat", "Soybeans", "Potatoes", "Tomatoes", "Lettuce", "Jalapeños" // ... and so on
-// ];
-
-// const cropDropdown = document.getElementById("cropDropdown");
-// commonCrops.forEach((crop) => {
-//     const option = document.createElement("option");
-//     option.value = crop.toLowerCase();
-//     option.textContent = crop;
-//     cropDropdown.appendChild(option);
-// });
-
-
-
-
-
-// function filterCrops() {
-//     const input = document.getElementById("cropSelection");
-//     const filter = input.value.toLowerCase();
-//     const options = document.querySelectorAll("#cropSelection option");
-
-//     options.forEach((option) => {
-//         const cropName = option.textContent.toLowerCase();
-//         if (cropName.includes(filter)) {
-//             option.style.display = "block";
-//         } else {
-//             option.style.display = "none";
-//         }
-//     });
-// }
-
-// // Add the 100 most common crops dynamically (you can replace these with actual crop names)
-// const commonCrops = [
-//     "Rice", "Maize", "Wheat", "Soybeans", "Potatoes", "Tomatoes", "Lettuce", "Jalapeños" // ... and so on
-// ];
-
-// const cropSelection = document.getElementById("cropSelection");
-// commonCrops.forEach((crop) => {
-//     const option = document.createElement("option");
-//     option.value = crop.toLowerCase();
-//     option.textContent = crop;
-//     cropSelection.appendChild(option);
-// });
-
-
-
-
-
+   
     function saveField() {
         console.log('Attempting to saveField');
     
@@ -304,29 +184,6 @@
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
-    // var drawControl = new L.Control.Draw({
-
-    //     draw: {
-    //         polygon: {
-    //             shapeOptions: {
-    //                 fillColor: '#ff5a5e',
-    //                 color: '#ff5a5e'
-    //             },
-    //             tooltip: 'Draw your field boundaries!' // Tooltip text for the polygon button
-    //         },
-    //         // Add more draw options with tooltips as needed
-    //         circle: false,
-    //         marker: false, // Disable marker drawing
-    //         polyline: false, // Disable polyline drawing
-    //         rectangle: false // Disable rectangle drawing
-    //     },
-    //     edit: {
-    //         featureGroup: drawnItems,
-    //         remove: true
-    //     }
-    // });
-
-    // map.addControl(drawControl);
 
     ////
     map.on('draw:created', function (event) {
