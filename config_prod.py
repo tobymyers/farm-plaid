@@ -4,9 +4,9 @@ import os
 
 class Config:
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = 'postgres://hbaxnvdvwafokt:75cf6fbfa2083653204c4d990031e6db252518b44b09de93706641f7f0fe8369@ec2-44-211-104-233.compute-1.amazonaws.com:5432/d9osoclqrs7esc'
     # Other production configurations
-    CLOUD_DATABASE_URL = os.environ.get('DATABASE_URL')
+    CLOUD_DATABASE_URL = SQLALCHEMY_DATABASE_URI
 
 
 
